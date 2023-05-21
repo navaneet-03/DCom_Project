@@ -33,13 +33,17 @@ class nodeStruct:
         return "MAC: " + self.mac + " Lat: " + str(self.lat) + " Lon: " + str(self.lon)
     
 
-class GMAC:
-    def __init__(self):
+class groupStruct:
+    def __init__(self, reporterIndex):
+        self.reporter= reporterIndex
         self.macList = []
 
     def addNode(self, mac, lat, lon, active):
         newNode = nodeStruct(mac, lat, lon, active)
         self.macList.append(newNode)
+
+    def getReporter(self):
+        return self.reporter
 
     def getMAC(self, index):
         return self.macList[index].getMAC()
@@ -52,6 +56,9 @@ class GMAC:
     
     def getActive(self, index):
         return self.macList[index].active()
+    
+    def setReporter(self, reporterIndex):
+        self.reporter = reporterIndex
 
     def setMAC(self, index, mac):
         self.macList[index].setMAC(mac)
