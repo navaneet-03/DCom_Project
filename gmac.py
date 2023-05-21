@@ -28,7 +28,7 @@ class nodeStruct:
 
     def setActive(self, active):
         self.active = active
-        
+
     def __str__(self):
         return "MAC: " + self.mac + " Lat: " + str(self.lat) + " Lon: " + str(self.lon)
     
@@ -66,7 +66,7 @@ class GMAC:
         self.macList[index].setActive(active)
 
     def __str__(self):
-        return "MAC: " + self.macList[0].getMAC() + " Lat: " + str(self.macList[0].getLat()) + " Lon: " + str(self.macList[0].getLon())
+        return "MAC: " + self.macList[0].getMAC() + " Lat: " + str(self.macList[0].getLat()) + " Lon: " + str(self.macList[0].getLon()) + " Active: " + str(self.macList[0].getActive())
 
     def __len__(self):
         return len(self.macList)
