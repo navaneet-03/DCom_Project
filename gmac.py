@@ -1,4 +1,5 @@
 import random
+import time
 
 
 class nodeStruct:
@@ -80,6 +81,18 @@ class groupStruct:
 
     def __len__(self):
         return len(self.macList)
+    
+    def CSMA_CA(self):
+        for i in range(len(self.macList)):
+            if(self.macList[i].getActive() == False):
+                for j in range(len(self.macList)):
+                    if(self.macList[j].getActive() == True):
+                        self.setActive(j,True)
+                        self.setActive(i,True)
+                        time.sleep(0.1)
+                        self.setActive(j,False)
+                        self.setActive(i,False)
+                        break
 
 
 
@@ -100,4 +113,3 @@ class GMAC:
         
         
 
-        
