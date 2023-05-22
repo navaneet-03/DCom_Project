@@ -1,3 +1,6 @@
+import random
+
+
 class nodeStruct:
     def __init__(self, mac, lat, lon, active):
         self.mac = mac
@@ -34,9 +37,9 @@ class nodeStruct:
     
 
 class groupStruct:
-    def __init__(self, reporterIndex):
+    def __init__(self, reporterIndex, macList ):
         self.reporter= reporterIndex
-        self.macList = []
+        self.macList = macList
 
     def addNode(self, mac, lat, lon, active):
         newNode = nodeStruct(mac, lat, lon, active)
@@ -78,4 +81,23 @@ class groupStruct:
     def __len__(self):
         return len(self.macList)
 
-    
+
+
+class GMAC:
+
+    def __init__(self, numberOfGroups, numberOfNodes):
+        self.groupList = []
+        self.numberOfGroups = numberOfGroups
+        self.numberOfNodes = numberOfNodes
+
+        ap=nodeStruct("00:00:00:00:00:00", 0, 0, False)
+        for i in range(numberOfGroups):
+            nodeList = []
+            for j in range(numberOfGroups):
+                nodeList.append(nodeStruct("00:00:00:00:00:01", random.random(), random.random(), False))
+            self.groupList.append(groupStruct(i, nodeList))
+
+        
+        
+
+        
