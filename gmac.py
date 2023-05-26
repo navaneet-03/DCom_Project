@@ -122,19 +122,19 @@ class GMAC:
         self.ap=nodeStruct("00:00:00:00:00:00", 0, 0, False)
         self.gaf=dict()
         
-        for i in range(numberOfGroups):
+        for i in range(self.numberOfGroups):
             nodeList = []
-            for j in range(numberOfGroups):
+            for j in range(self.numberOfNodes):
                 nodeList.append(nodeStruct("00:00:00:00:00:01", random.random(), random.random(), False))
-            self.groupList.append(groupStruct(random.randint(0,len(nodeList)), nodeList))
+            self.groupList.append(groupStruct(random.randint(0,len(nodeList) - 1), nodeList))
 
         
     def EarlyReporter(self):
         for i in range(self.numberOfGroups):
-            self.groupList[self.groupList[i].getReporter()].setActive(True)
+            self.groupList[i].setActiveIndex(self.groupList[i].getReporter(),True)
             self.ap.setActive(True)
             time.sleep(0.1)
-            self.groupList[self.groupList[i].getReporter()].setActive(False)
+            self.groupList[i].setActiveIndex(self.groupList[i].getReporter(),False)
             self.ap.setActive(False)
 
     def GAF(self,eventInArea: list[int]):
@@ -145,30 +145,37 @@ class GMAC:
             self.gaf[-1]=1
 
     def withinGroupCSMA(self):
+        start=time.time()
         for i in range(self.numberOfGroups):
             self.groupList[i].CSMA_CA()
+        end=time.time()
+        return end-start
 
     def process_group(self, group, time_slot_duration):
         if group in self.gaf:
             rep = self.groupList[group].getReporter()
             group_time_slot = group * time_slot_duration  
-            self.groupList[rep].setActive(rep, True)
+            self.groupList[group].setActiveIndex(rep, True)
             time.sleep(group_time_slot) 
-            self.groupList[rep].setActive(rep, False)
+            self.groupList[group].setActiveIndex(rep, False)
 
         time.sleep(time_slot_duration) 
 
     def GAP(self):
+        start=time.time()
         time_slot_duration = 0.1
 
         processes = []
         for i in range(self.numberOfGroups):
-            process = multiprocessing.Process(target=self.process_group, args=(self, i, time_slot_duration))
+            process = multiprocessing.Process(target=self.process_group, args=( i, time_slot_duration))
             processes.append(process)
             process.start()
 
         for process in processes:
             process.join()
+
+        end=time.time()
+        return end-start
     
 def test_gmac():
     # Initialize GMAC with 3 groups and 4 nodes per group
@@ -191,11 +198,13 @@ def test_gmac():
 
     # Test withinGroupCSMA
     print("Testing withinGroupCSMA:")
-    gmac.withinGroupCSMA()
+    i=gmac.withinGroupCSMA()
+    print(i)
 
     # Test GAP
     print("Testing GAP:")
-    gmac.GAP()
+    j=gmac.GAP()
+    print(j)
 
 
 if __name__ == "__main__":
