@@ -149,21 +149,17 @@ class GMAC:
             self.groupList[i].CSMA_CA()
 
     def GAP(self):
-        time.sleep(0.1)
-        for i in self.gaf.keys():
-            if i == -1:
-                continue
-            else:
-                rep=self.groupList[i].getReporter()
-                for j in range(self.numberOfGroups):
-                    if j == rep:
-                        continue
-                    else:
-                        self.groupList[i].setActive(j,True)
-                        self.groupList[rep].setActive(rep,True)
-                        time.sleep(0.1)
-                        self.groupList[j].setActive(j,False)
-                        self.groupList[rep].setActive(rep,False)
+        time_slot_duration = 0.1  
+
+        for i in range(self.numberOfGroups):
+            if i in self.gaf:
+                rep = self.groupList[i].getReporter()
+                group_time_slot = i * time_slot_duration  
+                self.groupList[rep].setActive(rep, True)
+                time.sleep(group_time_slot) 
+                self.groupList[rep].setActive(rep, False)
+
+            time.sleep(time_slot_duration)  
     
 
 if __name__ == "__main__":
