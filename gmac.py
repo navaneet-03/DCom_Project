@@ -4,86 +4,86 @@ import time
 
 
 class nodeStruct:
-    def __init__(self, mac, lat, lon, active):
+    def __init__(self, mac: str, lat: float, lon: float, active: bool):
         self.mac = mac
         self.lat = lat
         self.lon = lon
         self.active = active
 
-    def getMAC(self):
+    def getMAC(self)->str:
         return self.mac
 
-    def getLat(self):
+    def getLat(self)->float:
         return self.lat
 
-    def getLon(self):
+    def getLon(self)->float:
         return self.lon
     
-    def getActive(self):
+    def getActive(self)->bool:
         return self.active
 
-    def setMAC(self, mac):
+    def setMAC(self, mac)->None:
         self.mac = mac
 
-    def setLat(self, lat):
+    def setLat(self, lat)->None:
         self.lat = lat
 
-    def setLon(self, lon):
+    def setLon(self, lon)->None:
         self.lon = lon
 
-    def setActive(self, active):
+    def setActive(self, active)->None:
         self.active = active
 
-    def __str__(self):
+    def __str__(self)->str:
         return "MAC: " + self.mac + " Lat: " + str(self.lat) + " Lon: " + str(self.lon)
     
 
 class groupStruct:
-    def __init__(self, reporterIndex, nodeList ):
+    def __init__(self, reporterIndex: int, nodeList : list[nodeStruct]):
         self.reporter= reporterIndex
         self.nodeList = nodeList
 
-    def addNode(self, mac, lat, lon, active):
+    def addNode(self, mac: str, lat: float, lon: float, active:bool)->None:
         newNode = nodeStruct(mac, lat, lon, active)
         self.nodeList.append(newNode)
 
-    def getReporter(self):
+    def getReporter(self)->int:
         return self.reporter
 
-    def getMACIndex(self, index):
+    def getMACIndex(self, index:int)->str:
         return self.nodeList[index].getMAC()
 
-    def getLatIndex(self, index):
+    def getLatIndex(self, index:int)->float:
         return self.nodeList[index].getLat()
 
-    def getLonIndex(self, index):
+    def getLonIndex(self, index:int) ->float:
         return self.nodeList[index].getLon()
     
-    def getActivityIndex(self, index):
+    def getActivityIndex(self, index:int)->bool:
         return self.nodeList[index].getActive()
     
-    def setReporter(self, reporterIndex):
+    def setReporter(self, reporterIndex:int)->None:
         self.reporter = reporterIndex
 
-    def setMAC(self, index, mac):
+    def setMAC(self, index:int, mac:str)->None:
         self.nodeList[index].setMAC(mac)
 
-    def setLatIndex(self, index, lat):
+    def setLatIndex(self, index:int, lat:float)->None:
         self.nodeList[index].setLat(lat)
 
-    def setLonIndex(self, index, lon):
+    def setLonIndex(self, index:int, lon:float)->None:
         self.nodeList[index].setLon(lon)
 
-    def setActiveIndex(self, index, active):
+    def setActiveIndex(self, index:int, active:bool)->None:
         self.nodeList[index].setActive(active)
 
-    def __str__(self):
+    def __str__(self)->str:
         return "MAC: " + self.nodeList[0].getMAC() + " Lat: " + str(self.nodeList[0].getLat()) + " Lon: " + str(self.nodeList[0].getLon()) + " Active: " + str(self.nodeList[0].getActive())
 
-    def __len__(self):
+    def __len__(self)->int:
         return len(self.nodeList)
     
-    def CSMA_CA(self):
+    def CSMA_CA(self)->float:
         def process_node(i):
             if not self.nodeList[i].getActive():
                 is_collision = False
@@ -115,8 +115,8 @@ class groupStruct:
 
 class GMAC:
 
-    def __init__(self, numberOfGroups, numberOfNodes):
-        self.groupList = []
+    def __init__(self, numberOfGroups:int, numberOfNodes:int):
+        self.groupList: list[groupStruct] = []
         self.numberOfGroups = numberOfGroups
         self.numberOfNodes = numberOfNodes
         self.ap=nodeStruct("00:00:00:00:00:00", 0, 0, False)
@@ -131,18 +131,40 @@ class GMAC:
         
     def EarlyReporter(self):
         for i in range(self.numberOfGroups):
-            self.groupList[i].setActive(0,True)
+            self.groupList[self.groupList.reporter].setActive(0,True)
             self.ap.setActive(True)
             time.sleep(0.1)
-            self.groupList[i].setActive(0,False)
+            self.groupList[self.groupList.reporter].setActive(0,False)
             self.ap.setActive(False)
 
-    def GAF(self,eventInArea):
+    def GAF(self,eventInArea: list[int]):
         for i in range(self.numberOfGroups):
             if(eventInArea[i] == True):
                 self.gaf[i]=0.1
         else:
             self.gaf[-1]=1
+
+    def withinGroupCSMA(self):
+        for i in range(self.numberOfGroups):
+            self.groupList[i].CSMA_CA()
+
+    def GAP(self):
+        time.sleep(0.1)
+        for i in self.gaf.keys():
+            if i == -1:
+                continue
+            else:
+                rep=self.groupList[i].getReporter()
+                for j in range(self.numberOfGroups):
+                    if j == rep:
+                        continue
+                    else:
+                        self.groupList[i].setActive(j,True)
+                        self.groupList[rep].setActive(rep,True)
+                        time.sleep(0.1)
+                        self.groupList[j].setActive(j,False)
+                        self.groupList[rep].setActive(rep,False)
+    
 
 if __name__ == "__main__":
     # Create a group of nodes
@@ -169,3 +191,28 @@ if __name__ == "__main__":
     print("Final Group State:")
     for i in range(len(group)):
         print(group.getMACIndex(i), group.getLatIndex(i), group.getLonIndex(i), group.getActivityIndex(i))
+
+    print()
+    # Create an instance of GMAC
+    gmac = GMAC(numberOfGroups=2, numberOfNodes=3)
+
+    # Set the initial state of the nodes
+    gmac.groupList[0].setActiveIndex(0, True)
+    gmac.groupList[1].setActiveIndex(0, True)
+    gmac.groupList[1].setActiveIndex(1, True)
+
+    # Invoke the CSMA_CA method to simulate the protocol
+    gmac.groupList[0].CSMA_CA()
+    gmac.groupList[1].CSMA_CA()
+
+    # Print the state of the nodes after the CSMA-CA protocol
+    for i in range(len(gmac.groupList)):
+        print("Group", i)
+        for j in range(len(gmac.groupList[i])):
+            print("Node", j)
+            print("MAC:", gmac.groupList[i].getMACIndex(j))
+            print("Lat:", gmac.groupList[i].getLatIndex(j))
+            print("Lon:", gmac.groupList[i].getLonIndex(j))
+            print("Active:", gmac.groupList[i].getActivityIndex(j))
+            print()
+
