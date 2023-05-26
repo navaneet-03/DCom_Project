@@ -93,13 +93,11 @@ class groupStruct:
                         break
 
                 if is_collision:
-                    # Collision occurred, node i backs off for a random time
-                    backoff_time = random.uniform(0, 1)  # Adjust the range as per your requirements
+                    backoff_time = random.uniform(0, 1) 
                     time.sleep(backoff_time)
                 else:
-                    # Node i can transmit
                     self.nodeList[i].setActive(True)
-                    time.sleep(0.1)  # Simulate transmission time
+                    time.sleep(0.1) 
                     self.nodeList[i].setActive(False)
 
         # Create a process for each node
