@@ -148,18 +148,27 @@ class GMAC:
         for i in range(self.numberOfGroups):
             self.groupList[i].CSMA_CA()
 
+    def process_group(self, group, time_slot_duration):
+        if group in self.gaf:
+            rep = self.groupList[group].getReporter()
+            group_time_slot = group * time_slot_duration  
+            self.groupList[rep].setActive(rep, True)
+            time.sleep(group_time_slot) 
+            self.groupList[rep].setActive(rep, False)
+
+        time.sleep(time_slot_duration) 
+
     def GAP(self):
-        time_slot_duration = 0.1  
+        time_slot_duration = 0.1
 
+        processes = []
         for i in range(self.numberOfGroups):
-            if i in self.gaf:
-                rep = self.groupList[i].getReporter()
-                group_time_slot = i * time_slot_duration  
-                self.groupList[rep].setActive(rep, True)
-                time.sleep(group_time_slot) 
-                self.groupList[rep].setActive(rep, False)
+            process = multiprocessing.Process(target=self.process_group, args=(self, i, time_slot_duration))
+            processes.append(process)
+            process.start()
 
-            time.sleep(time_slot_duration)  
+        for process in processes:
+            process.join()
     
 
 if __name__ == "__main__":
