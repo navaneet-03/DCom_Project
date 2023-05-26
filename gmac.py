@@ -126,15 +126,15 @@ class GMAC:
             nodeList = []
             for j in range(numberOfGroups):
                 nodeList.append(nodeStruct("00:00:00:00:00:01", random.random(), random.random(), False))
-            self.groupList.append(groupStruct(i, nodeList))
+            self.groupList.append(groupStruct(random.randint(0,len(nodeList)), nodeList))
 
         
     def EarlyReporter(self):
         for i in range(self.numberOfGroups):
-            self.groupList[self.groupList.reporter].setActive(0,True)
+            self.groupList[self.groupList[i].getReporter()].setActive(True)
             self.ap.setActive(True)
             time.sleep(0.1)
-            self.groupList[self.groupList.reporter].setActive(0,False)
+            self.groupList[self.groupList[i].getReporter()].setActive(False)
             self.ap.setActive(False)
 
     def GAF(self,eventInArea: list[int]):
@@ -170,54 +170,33 @@ class GMAC:
         for process in processes:
             process.join()
     
+def test_gmac():
+    # Initialize GMAC with 3 groups and 4 nodes per group
+    gmac = GMAC(3, 4)
+
+    # Add nodes to each group
+    for i in range(gmac.numberOfGroups):
+        for j in range(gmac.numberOfNodes):
+            gmac.groupList[i].addNode(f"Node_{i}_{j}", random.random(), random.random(), False)
+
+    # Test EarlyReporter
+    print("Testing EarlyReporter:")
+    gmac.EarlyReporter()
+
+    # Test GAF
+    print("Testing GAF:")
+    event_in_area = [True, False, True]
+    gmac.GAF(event_in_area)
+    print(gmac.gaf)
+
+    # Test withinGroupCSMA
+    print("Testing withinGroupCSMA:")
+    gmac.withinGroupCSMA()
+
+    # Test GAP
+    print("Testing GAP:")
+    gmac.GAP()
+
 
 if __name__ == "__main__":
-    # Create a group of nodes
-    group = groupStruct(0, [])
-
-    # Add nodes to the group
-    group.addNode("Node1", 10, 20, True)
-    group.addNode("Node2", 15, 25, False)
-    group.addNode("Node3", 30, 40, True)
-    group.addNode("Node4", 35, 45, False)
-
-    # Print the initial state of the group
-    print("Initial Group State:\n")
-    for i in range(len(group)):
-        print(group.getMACIndex(i), group.getLatIndex(i), group.getLonIndex(i), group.getActivityIndex(i))
-    print()
-
-    # Apply CSMA/CA protocol
-    start=(time.time())
-    group.CSMA_CA()
-    print(time.time()-start)
-
-    # Print the final state of the group
-    print("Final Group State:")
-    for i in range(len(group)):
-        print(group.getMACIndex(i), group.getLatIndex(i), group.getLonIndex(i), group.getActivityIndex(i))
-
-    print()
-    # Create an instance of GMAC
-    gmac = GMAC(numberOfGroups=2, numberOfNodes=3)
-
-    # Set the initial state of the nodes
-    gmac.groupList[0].setActiveIndex(0, True)
-    gmac.groupList[1].setActiveIndex(0, True)
-    gmac.groupList[1].setActiveIndex(1, True)
-
-    # Invoke the CSMA_CA method to simulate the protocol
-    gmac.groupList[0].CSMA_CA()
-    gmac.groupList[1].CSMA_CA()
-
-    # Print the state of the nodes after the CSMA-CA protocol
-    for i in range(len(gmac.groupList)):
-        print("Group", i)
-        for j in range(len(gmac.groupList[i])):
-            print("Node", j)
-            print("MAC:", gmac.groupList[i].getMACIndex(j))
-            print("Lat:", gmac.groupList[i].getLatIndex(j))
-            print("Lon:", gmac.groupList[i].getLonIndex(j))
-            print("Active:", gmac.groupList[i].getActivityIndex(j))
-            print()
-
+    test_gmac()
