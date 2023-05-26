@@ -1,3 +1,4 @@
+import multiprocessing
 import random
 import time
 
@@ -38,61 +39,79 @@ class nodeStruct:
     
 
 class groupStruct:
-    def __init__(self, reporterIndex, macList ):
+    def __init__(self, reporterIndex, nodeList ):
         self.reporter= reporterIndex
-        self.macList = macList
+        self.nodeList = nodeList
 
     def addNode(self, mac, lat, lon, active):
         newNode = nodeStruct(mac, lat, lon, active)
-        self.macList.append(newNode)
+        self.nodeList.append(newNode)
 
     def getReporter(self):
         return self.reporter
 
     def getMAC(self, index):
-        return self.macList[index].getMAC()
+        return self.nodeList[index].getMAC()
 
     def getLat(self, index):
-        return self.macList[index].getLat()
+        return self.nodeList[index].getLat()
 
     def getLon(self, index):
-        return self.macList[index].getLon()
+        return self.nodeList[index].getLon()
     
     def getActive(self, index):
-        return self.macList[index].active()
+        return self.nodeList[index].active()
     
     def setReporter(self, reporterIndex):
         self.reporter = reporterIndex
 
     def setMAC(self, index, mac):
-        self.macList[index].setMAC(mac)
+        self.nodeList[index].setMAC(mac)
 
     def setLat(self, index, lat):
-        self.macList[index].setLat(lat)
+        self.nodeList[index].setLat(lat)
 
     def setLon(self, index, lon):
-        self.macList[index].setLon(lon)
+        self.nodeList[index].setLon(lon)
 
     def setActive(self, index, active):
-        self.macList[index].setActive(active)
+        self.nodeList[index].setActive(active)
 
     def __str__(self):
-        return "MAC: " + self.macList[0].getMAC() + " Lat: " + str(self.macList[0].getLat()) + " Lon: " + str(self.macList[0].getLon()) + " Active: " + str(self.macList[0].getActive())
+        return "MAC: " + self.nodeList[0].getMAC() + " Lat: " + str(self.nodeList[0].getLat()) + " Lon: " + str(self.nodeList[0].getLon()) + " Active: " + str(self.nodeList[0].getActive())
 
     def __len__(self):
-        return len(self.macList)
+        return len(self.nodeList)
     
     def CSMA_CA(self):
-        for i in range(len(self.macList)):
-            if(self.macList[i].getActive() == False):
-                for j in range(len(self.macList)):
-                    if(self.macList[j].getActive() == True):
-                        self.setActive(j,True)
-                        self.setActive(i,True)
-                        time.sleep(0.1)
-                        self.setActive(j,False)
-                        self.setActive(i,False)
+        def process_node(i):
+            if not self.nodeList[i].getActive():
+                is_collision = False
+                for j in range(len(self.nodeList)):
+                    if j != i and self.nodeList[j].getActive():
+                        is_collision = True
                         break
+
+                if is_collision:
+                    # Collision occurred, node i backs off for a random time
+                    backoff_time = random.uniform(0, 1)  # Adjust the range as per your requirements
+                    time.sleep(backoff_time)
+                else:
+                    # Node i can transmit
+                    self.nodeList[i].setActive(True)
+                    time.sleep(0.1)  # Simulate transmission time
+                    self.nodeList[i].setActive(False)
+
+        # Create a process for each node
+        processes = []
+        for i in range(len(self.nodeList)):
+            process = multiprocessing.Process(target=process_node, args=(i,))
+            processes.append(process)
+            process.start()
+
+        # Wait for all processes to finish
+        for process in processes:
+            process.join()
 
 
 
@@ -102,8 +121,9 @@ class GMAC:
         self.groupList = []
         self.numberOfGroups = numberOfGroups
         self.numberOfNodes = numberOfNodes
-
-        ap=nodeStruct("00:00:00:00:00:00", 0, 0, False)
+        self.ap=nodeStruct("00:00:00:00:00:00", 0, 0, False)
+        self.gaf=dict()
+        
         for i in range(numberOfGroups):
             nodeList = []
             for j in range(numberOfGroups):
@@ -111,5 +131,17 @@ class GMAC:
             self.groupList.append(groupStruct(i, nodeList))
 
         
-        
+    def EarlyReporter(self):
+        for i in range(self.numberOfGroups):
+            self.groupList[i].setActive(0,True)
+            self.ap.setActive(True)
+            time.sleep(0.1)
+            self.groupList[i].setActive(0,False)
+            self.ap.setActive(False)
 
+    def GAF(self,eventInArea):
+        for i in range(self.numberOfGroups):
+            if(eventInArea[i] == True):
+                self.gaf[i]=0.1
+        else:
+            self.gaf[-1]=1
