@@ -50,17 +50,17 @@ class groupStruct:
     def getReporter(self):
         return self.reporter
 
-    def getMAC(self, index):
+    def getMACIndex(self, index):
         return self.nodeList[index].getMAC()
 
-    def getLat(self, index):
+    def getLatIndex(self, index):
         return self.nodeList[index].getLat()
 
-    def getLon(self, index):
+    def getLonIndex(self, index):
         return self.nodeList[index].getLon()
     
-    def getActive(self, index):
-        return self.nodeList[index].active()
+    def getActivityIndex(self, index):
+        return self.nodeList[index].getActive()
     
     def setReporter(self, reporterIndex):
         self.reporter = reporterIndex
@@ -68,13 +68,13 @@ class groupStruct:
     def setMAC(self, index, mac):
         self.nodeList[index].setMAC(mac)
 
-    def setLat(self, index, lat):
+    def setLatIndex(self, index, lat):
         self.nodeList[index].setLat(lat)
 
-    def setLon(self, index, lon):
+    def setLonIndex(self, index, lon):
         self.nodeList[index].setLon(lon)
 
-    def setActive(self, index, active):
+    def setActiveIndex(self, index, active):
         self.nodeList[index].setActive(active)
 
     def __str__(self):
@@ -143,3 +143,29 @@ class GMAC:
                 self.gaf[i]=0.1
         else:
             self.gaf[-1]=1
+
+if __name__ == "__main__":
+    # Create a group of nodes
+    group = groupStruct(0, [])
+
+    # Add nodes to the group
+    group.addNode("Node1", 10, 20, True)
+    group.addNode("Node2", 15, 25, False)
+    group.addNode("Node3", 30, 40, True)
+    group.addNode("Node4", 35, 45, False)
+
+    # Print the initial state of the group
+    print("Initial Group State:\n")
+    for i in range(len(group)):
+        print(group.getMACIndex(i), group.getLatIndex(i), group.getLonIndex(i), group.getActivityIndex(i))
+    print()
+
+    # Apply CSMA/CA protocol
+    start=(time.time())
+    group.CSMA_CA()
+    print(time.time()-start)
+
+    # Print the final state of the group
+    print("Final Group State:")
+    for i in range(len(group)):
+        print(group.getMACIndex(i), group.getLatIndex(i), group.getLonIndex(i), group.getActivityIndex(i))
