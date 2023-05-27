@@ -138,7 +138,7 @@ class GMAC:
             self.groupList[i].setActiveIndex(self.groupList[i].getReporter(),False)
             self.ap.setActive(False)
 
-    def GAF(self,eventInArea: list[int]):
+    def GAF(self,eventInArea: list[bool]):
         for i in range(self.numberOfGroups):
             if(eventInArea[i] == True):
                 self.gaf[i]=0.1
