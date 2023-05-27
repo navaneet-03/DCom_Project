@@ -32,8 +32,8 @@ class Sub_GMAC:
         while i * grouping < self.numberOfGroups:
             self.subGroupList.append(gmac.GMAC(grouping,self.numberOfNodes,self.groupList[i * grouping:(i + 1) * grouping]))
             i+=1
-        if self.numberOfGroups % grouping != 0:
-            self.subGroupList.append(gmac.GMAC(self.numberOfGroups % grouping,self.numberOfNodes,self.groupList[i * grouping:]))
+        else:
+            self.subGroupList.append(gmac.GMAC(self.numberOfGroups - i * grouping,self.numberOfNodes,self.groupList[i * grouping:self.numberOfGroups]))
 
     def run(self):
         self.createGroups()
