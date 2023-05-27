@@ -177,7 +177,14 @@ class GMAC:
 
         end=time.time()
         return end-start
-    
+
+    def run(self):
+        self.createGroups()
+        self.EarlyReporter()
+        self.GAF()
+        self.withinGroupCSMA()
+        self.GAP()
+
 def test_gmac():
     # Initialize GMAC with 3 groups and 4 nodes per group
     gmac = GMAC(3, 4)
