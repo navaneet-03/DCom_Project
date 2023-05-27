@@ -115,13 +115,14 @@ class groupStruct:
 
 class GMAC:
 
-    def __init__(self, numberOfGroups:int, numberOfNodes:int):
+    def __init__(self, numberOfGroups:int, numberOfNodes:int, groupList:list[groupStruct]):
         self.groupList: list[groupStruct] = []
         self.numberOfGroups = numberOfGroups
         self.numberOfNodes = numberOfNodes
         self.ap=nodeStruct("00:00:00:00:00:00", 0, 0, False)
         self.gaf=dict()
         
+    def createGroups(self):
         for i in range(self.numberOfGroups):
             nodeList = []
             for j in range(self.numberOfNodes):
