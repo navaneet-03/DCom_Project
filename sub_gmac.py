@@ -9,7 +9,7 @@ class Sub_GMAC:
         self.numberOfGroups = numberOfGroups
         self.numberOfNodes = numberOfNodes
         self.ap=gmac.nodeStruct("00:00:00:00:00:00", 0, 0, False)
-        self.gaf=dict()
+        #self.gaf=dict()
         self.subGroupList: list[gmac.GMAC]=[]
         
     def createGroups(self):
@@ -35,11 +35,11 @@ class Sub_GMAC:
         else:
             self.subGroupList.append(gmac.GMAC(self.numberOfGroups - i * grouping,self.numberOfNodes,self.groupList[i * grouping:self.numberOfGroups]))
 
-    def run(self):
+    def run(self,eventInArea):
         self.createGroups()
         self.subGMACCreation(2)
         for i in range(len(self.subGroupList)):
-            self.gaf[i]=multiprocessing.Process(target=self.subGroupList[i].run)
+            self.gaf[i]=multiprocessing.Process(target=self.subGroupList[i].sub_run, args=(eventInArea[i],))
             self.gaf[i].start()
         self.EarlyReporter()
         for i in range(len(self.subGroupList)):

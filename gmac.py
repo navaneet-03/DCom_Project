@@ -39,7 +39,7 @@ class nodeStruct:
     
 
 class groupStruct:
-    def __init__(self, reporterIndex: int, nodeList : list[nodeStruct]):
+    def __init__(self, reporterIndex: int, nodeList : list[nodeStruct]=[]):
         self.reporter= reporterIndex
         self.nodeList = nodeList
 
@@ -178,42 +178,14 @@ class GMAC:
         end=time.time()
         return end-start
 
-    def run(self):
+    def run(self, eventInArea: list[bool]):
         self.createGroups()
         self.EarlyReporter()
-        self.GAF()
+        self.GAF(eventInArea)
         self.withinGroupCSMA()
         self.GAP()
-
-def test_gmac():
-    # Initialize GMAC with 3 groups and 4 nodes per group
-    gmac = GMAC(3, 4)
-
-    # Add nodes to each group
-    for i in range(gmac.numberOfGroups):
-        for j in range(gmac.numberOfNodes):
-            gmac.groupList[i].addNode(f"Node_{i}_{j}", random.random(), random.random(), False)
-
-    # Test EarlyReporter
-    print("Testing EarlyReporter:")
-    gmac.EarlyReporter()
-
-    # Test GAF
-    print("Testing GAF:")
-    event_in_area = [True, False, True]
-    gmac.GAF(event_in_area)
-    print(gmac.gaf)
-
-    # Test withinGroupCSMA
-    print("Testing withinGroupCSMA:")
-    i=gmac.withinGroupCSMA()
-    print(i)
-
-    # Test GAP
-    print("Testing GAP:")
-    j=gmac.GAP()
-    print(j)
-
-
-if __name__ == "__main__":
-    test_gmac()
+    
+    def sub_run(self, eventInArea: list[bool]):
+        self.GAF(eventInArea)
+        self.withinGroupCSMA()
+        self.GAP()
