@@ -139,7 +139,7 @@ class GMAC:
             self.ap.setActive(False)
 
     def GAF(self,eventInArea: list[bool]):
-        for i in range(self.numberOfGroups):
+        for i in range(len(eventInArea)):
             if(eventInArea[i] == True):
                 self.gaf[i]=0.1
         else:
@@ -185,7 +185,29 @@ class GMAC:
         self.withinGroupCSMA()
         self.GAP()
     
-    def sub_run(self, eventInArea: list[bool]):
-        self.GAF(eventInArea)
+    def sub_run(self, eventInArea: list[bool], group:int, groupSize:int):
+        self.GAF(eventInArea[group*groupSize:(group+1)*groupSize])
         self.withinGroupCSMA()
         self.GAP()
+
+if __name__ == "__main__":
+    
+    numberOfGroups = 6
+    numberOfNodes = 5
+
+    gmac = GMAC(numberOfGroups, numberOfNodes)
+
+    eventInArea = [True, False, True, True, False, True]  
+
+    print("Running GMAC simulation...")
+    gmac.run(eventInArea)
+
+    print("GMAC simulation completed.")
+
+    print("Testing withinGroupCSMA process...")
+    csma_time = gmac.withinGroupCSMA()
+    print("CSMA process completed. Time taken:", csma_time, "seconds")
+
+    print("Testing GAP process...")
+    gap_time = gmac.GAP()
+    print("GAP process completed. Time taken:", gap_time, "seconds")
