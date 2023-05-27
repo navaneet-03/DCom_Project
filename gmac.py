@@ -115,8 +115,8 @@ class groupStruct:
 
 class GMAC:
 
-    def __init__(self, numberOfGroups:int, numberOfNodes:int, groupList:list[groupStruct]):
-        self.groupList: list[groupStruct] = []
+    def __init__(self, numberOfGroups:int, numberOfNodes:int, groupList:list[groupStruct]=[]):
+        self.groupList: list[groupStruct] = groupList
         self.numberOfGroups = numberOfGroups
         self.numberOfNodes = numberOfNodes
         self.ap=nodeStruct("00:00:00:00:00:00", 0, 0, False)
