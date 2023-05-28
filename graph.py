@@ -30,6 +30,7 @@ def main():
     plt.plot(groups, timeSG, label="Sub GMAC, 2 Sub Groups")
     plt.plot(groups, timeSG2, label="Sub GMAC, 3 Sub Groups")
     plt.plot(groups, timeSG3, label="Sub GMAC, 4 Sub Groups")
+    plt.xticks(groups)
     plt.xlabel("Number of Groups")
     plt.ylabel("Time (s)")
     plt.title("GMAC vs Sub GMAC")
