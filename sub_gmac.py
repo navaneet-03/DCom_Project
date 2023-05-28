@@ -66,6 +66,21 @@ class Sub_GMAC:
         print("Time taken: ", end-start)
         return (end-start)/3
     
+    def run4(self, eventInArea):
+        self.createGroups()
+        start=time.time()
+        self.subGMACCreation(2)
+        for i in range(len(self.subGroupList)):
+            self.gaf[i] = multiprocessing.Process(target=self.subGroupList[i].sub_run, args=([eventInArea],i,self.grouping))
+            self.gaf[i].start()
+        self.EarlyReporter()
+        for i in range(len(self.subGroupList)):
+            self.gaf[i].join()
+        end=time.time()
+        print("Done")
+        print("Time taken: ", end-start)
+        return (end-start)/4
+    
 if __name__ == "__main__":
     numberOfGroups = 6
     numberOfNodes = 4
