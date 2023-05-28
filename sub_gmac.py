@@ -36,8 +36,9 @@ class Sub_GMAC:
         else:
             self.subGroupList.append(gmac.GMAC(self.numberOfGroups - i * grouping, self.numberOfNodes, self.groupList[i * grouping:self.numberOfGroups]))
 
-    def run(self, eventInArea):
+    def run2(self, eventInArea):
         self.createGroups()
+        start=time.time()
         self.subGMACCreation(2)
         for i in range(len(self.subGroupList)):
             self.gaf[i] = multiprocessing.Process(target=self.subGroupList[i].sub_run, args=([eventInArea],i,self.grouping))
@@ -45,8 +46,26 @@ class Sub_GMAC:
         self.EarlyReporter()
         for i in range(len(self.subGroupList)):
             self.gaf[i].join()
+        end=time.time()
         print("Done")
-
+        print("Time taken: ", end-start)
+        return (end-start)/2
+    
+    def run3(self, eventInArea):
+        self.createGroups()
+        start=time.time()
+        self.subGMACCreation(2)
+        for i in range(len(self.subGroupList)):
+            self.gaf[i] = multiprocessing.Process(target=self.subGroupList[i].sub_run, args=([eventInArea],i,self.grouping))
+            self.gaf[i].start()
+        self.EarlyReporter()
+        for i in range(len(self.subGroupList)):
+            self.gaf[i].join()
+        end=time.time()
+        print("Done")
+        print("Time taken: ", end-start)
+        return (end-start)/3
+    
 if __name__ == "__main__":
     numberOfGroups = 6
     numberOfNodes = 4
@@ -56,6 +75,7 @@ if __name__ == "__main__":
     eventInArea = [True, False, True, False, True, False]  
 
     print("Running Sub_GMAC simulation...")
-    sub_gmac.run(eventInArea)
+    print(sub_gmac.run2(eventInArea), "seconds")
+    print(sub_gmac.run3(eventInArea), "seconds")
 
     print("Sub_GMAC simulation completed.")

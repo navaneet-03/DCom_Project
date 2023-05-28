@@ -180,10 +180,13 @@ class GMAC:
 
     def run(self, eventInArea: list[bool]):
         self.createGroups()
+        start=time.time()
         self.EarlyReporter()
         self.GAF(eventInArea)
         self.withinGroupCSMA()
         self.GAP()
+        end=time.time()
+        return end-start
     
     def sub_run(self, eventInArea: list[bool], group:int, groupSize:int):
         self.GAF(eventInArea[group*groupSize:(group+1)*groupSize])
@@ -193,7 +196,7 @@ class GMAC:
 if __name__ == "__main__":
     
     numberOfGroups = 6
-    numberOfNodes = 5
+    numberOfNodes = 4
 
     gmac = GMAC(numberOfGroups, numberOfNodes)
 
